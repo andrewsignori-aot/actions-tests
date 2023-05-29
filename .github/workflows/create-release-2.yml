@@ -30,7 +30,7 @@ on:
           - publish
 
 jobs:
-  # Print variables for logging and debugging purposes (testing PR)
+  # Print variables for logging and debugging purposes
   checkEnv:
     name: Check Env variables
     runs-on: ubuntu-latest
