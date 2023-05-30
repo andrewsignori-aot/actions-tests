@@ -67,8 +67,8 @@ jobs:
         uses: zwaldowski/semver-release-action@v3
         with:
           prefix: "v"
-          bump: ${{ inputs.bumb }}
           preid: "prerelease"
+          bump: ${{ inputs.bumb }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
           per_branch: false
       - run: echo "Release tag ${{ steps.releaseNextTag.outputs.version_tag }} created!"
@@ -80,8 +80,8 @@ jobs:
         uses: zwaldowski/semver-release-action@v3
         with:
           prefix: "v"
-          bump: ${{ inputs.bumb }}
           preid: "prepatch"
+          bump: ${{ inputs.bumb }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
           per_branch: true
       - run: echo "Hotfix tag ${{ steps.hotfixTag.outputs.version_tag }} created!"
