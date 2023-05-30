@@ -70,30 +70,18 @@ jobs:
           preid: "prerelease"
           bump: ${{ inputs.bumb }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          dry_run: true
           per_branch: false
       - run: echo "Release tag ${{ steps.releaseNextTag.outputs.version_tag }} created!"
 
-      # Create hotfix tag
-      - name: "Create hotfix tag"
-        if: steps.releaseOrHotfix.outputs.value != 'release'
-        id: hotfixTag
-        uses: zwaldowski/semver-release-action@v3
-        with:
-          prefix: "v"
-          preid: "prepatch"
-          bump: ${{ inputs.bumb }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          per_branch: true
-      - run: echo "Hotfix tag ${{ steps.hotfixTag.outputs.version_tag }} created!"
-
-      # Define the temporary branch name
-      - name: Define the temporary branch name
+      # Define the new branch name
+      - name: Define the new branch name
         uses: haya14busa/action-cond@v1
         id: newBranchName
         with:
           cond: ${{ steps.releaseOrHotfix.outputs.value == 'release'}}
           if_true: "${{ steps.releaseOrHotfix.outputs.value }}/${{ steps.releaseNextTag.outputs.version_tag }}"
-          if_false: "${{ steps.releaseOrHotfix.outputs.value }}/${{ steps.hotfixTag.outputs.version_tag }}"
+          if_false: "${{ steps.releaseOrHotfix.outputs.value }}/${{ inputs.gitRef }}"
       - run: |
           echo "New branch name: ${{ steps.newBranchName.outputs.value }}"
 
