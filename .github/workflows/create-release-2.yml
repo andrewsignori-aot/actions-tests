@@ -68,7 +68,7 @@ jobs:
         with:
           prefix: "v"
           bump: ${{ inputs.bumb }}
-          preid: prerelease
+          preid: "prerelease"
           github_token: ${{ secrets.GITHUB_TOKEN }}
           per_branch: false
       - run: echo "Release tag ${{ steps.releaseNextTag.outputs.version_tag }} created!"
@@ -81,7 +81,7 @@ jobs:
         with:
           prefix: "v"
           bump: ${{ inputs.bumb }}
-          preid: prepatch
+          preid: "prepatch"
           github_token: ${{ secrets.GITHUB_TOKEN }}
           per_branch: true
       - run: echo "Hotfix tag ${{ steps.hotfixTag.outputs.version_tag }} created!"
@@ -92,8 +92,8 @@ jobs:
         id: newBranchName
         with:
           cond: ${{ steps.releaseOrHotfix.outputs.value == 'release'}}
-          if_true: ${{ steps.releaseNextTag.outputs.version_tag }}
-          if_false: ${{ steps.hotfixTag.outputs.version_tag }}
+          if_true: "${{ steps.releaseOrHotfix.outputs.value }}/${{ steps.releaseNextTag.outputs.version_tag }}"
+          if_false: "${{ steps.releaseOrHotfix.outputs.value }}/${{ steps.hotfixTag.outputs.version_tag }}"
       - run: |
           echo "New branch name: ${{ steps.newBranchName.outputs.value }}"
 
@@ -101,3 +101,5 @@ jobs:
       - name: Rename branch
         run: |
           git branch -m ${{ steps.newBranchName.outputs.value }}
+          git push origin -u ${{ steps.newBranchName.outputs.value }}
+          git push origin --delete "${{ steps.releaseOrHotfix.outputs.value }}/new-${{ steps.releaseOrHotfix.outputs.value }}"
