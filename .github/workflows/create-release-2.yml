@@ -82,7 +82,7 @@ jobs:
           git config user.name github-actions
           git config user.email github-actions@github.com
           git checkout -b "${{ steps.releaseOrHotfix.outputs.value }}/${{ steps.releaseOrHotfix.outputs.value }}"
-          git push
+          git push --set-upstream origin "${{ steps.releaseOrHotfix.outputs.value }}/${{ steps.releaseOrHotfix.outputs.value }}"
 
       # Create the tag
       - name: "Create tag"
