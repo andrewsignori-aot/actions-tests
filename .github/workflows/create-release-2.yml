@@ -75,6 +75,15 @@ jobs:
           if_true: ${{ inputs.bumb }}
           if_false: "prerelease"
 
+      # Create the branch
+      - name: Checkout branch
+        uses: actions/checkout@v3
+      - run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git checkout -b "${{ steps.releaseOrHotfix.outputs.value }}/${{ steps.releaseOrHotfix.outputs.value }}"
+          git push
+
       # Create the tag
       - name: "Create tag"
         id: createNextTag
@@ -85,12 +94,3 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           per_branch: true
       - run: echo "Tag ${{ steps.createNextTag.outputs.version_tag }} created!"
-
-      # Create the branch
-      - name: Checkout branch
-        uses: actions/checkout@v3
-      - run: |
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-          git checkout -b "${{ steps.releaseOrHotfix.outputs.value }}/${{ steps.createNextTag.outputs.version_tag }}"
-          git push
