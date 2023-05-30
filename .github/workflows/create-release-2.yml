@@ -43,7 +43,7 @@ jobs:
           echo OC CLI Version: $(oc version)
 
   createRelease:
-    name: "Create tag"
+    name: "Create release"
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     needs: checkEnv
@@ -58,20 +58,6 @@ jobs:
           if_false: release
       - run: |
           echo "Release type: ${{ steps.releaseOrHotfix.outputs.value }}"
-      # Create the branch using the commit SHA provided.
-      - name: Create branch
-        uses: peterjgrainger/action-create-branch@v2.2.0
-        with:
-          branch: "${{ steps.releaseOrHotfix.outputs.value }}/new-${{ steps.releaseOrHotfix.outputs.value }}"
-          sha: ${{ inputs.commitSHA }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Checkou new branch
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          ref: "${{ steps.releaseOrHotfix.outputs.value }}/new-${{ steps.releaseOrHotfix.outputs.value }}"
 
       - name: Get bumb value
         uses: haya14busa/action-cond@v1
@@ -88,10 +74,8 @@ jobs:
           cond: ${{ github.event_name == 'workflow_dispatch' && (inputs.bumb == 'premajor' || inputs.bumb == 'preminor' || inputs.bumb == 'prepatch' || inputs.bumb == 'prerelease') }}
           if_true: ${{ inputs.bumb }}
           if_false: "prerelease"
-      - run: |
-          echo "bumb: ${{ steps.getBumb.outputs.value }}"
-          echo "preId: ${{ steps.getPreId.outputs.value }}"
 
+      # Create the tag
       - name: "Create tag"
         id: createNextTag
         uses: zwaldowski/semver-release-action@v3
@@ -101,5 +85,12 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           per_branch: true
       - run: echo "Tag ${{ steps.createNextTag.outputs.version_tag }} created!"
-    outputs:
-      newTag: ${{ steps.createNextTag.outputs.version_tag }}
+
+      # Create the branch
+      - name: Checkout branch
+        uses: actions/checkout@v3
+      - run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git checkout -b "${{ steps.releaseOrHotfix.outputs.value }}/${{ steps.createNextTag.outputs.version_tag }}"
+          git push
