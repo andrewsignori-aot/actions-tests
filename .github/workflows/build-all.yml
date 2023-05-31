@@ -18,17 +18,17 @@ jobs:
       # Print variables for logging and debugging purposes
       - name: Print Env Vars
         run: |
-          echo Git base ref: ${{ github.base_ref }}
-          echo Git run number: ${{ github.run_number }}
+          echo Git ref_name: ${{ github.ref_name }}
+          echo Git run_number: ${{ github.run_number }}
       # Create tag
       - name: Create tag
         uses: actions/checkout@v3
       - run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
-          git tag "${{ github.base_ref }}+${{ github.run_number }}"
-          git push origin "${{ github.base_ref }}+${{ github.run_number }}"
+          git tag "${{ github.ref_name }}+${{ github.run_number }}"
+          git push origin "${{ github.ref_name }}+${{ github.run_number }}"
         # Do the build
       - name: Build
         run: |
-          echo version: ${{ github.base_ref }}+${{ github.run_number }}
+          echo version: ${{ github.ref_name }}+${{ github.run_number }}
