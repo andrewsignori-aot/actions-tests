@@ -25,13 +25,15 @@ jobs:
         run: |
           echo Git ref_name: ${{ github.ref_name }}
           echo Git run_number: ${{ github.run_number }}
+          echo Git event_name: ${{ github.event_name }}
+          echo Git targetBranchName: ${{ inputs.targetBranchName }}
 
       # Define target branch name.
       - name: Define target branch name
         uses: haya14busa/action-cond@v1
         id: defineTargetBranchName
         with:
-          cond: ${{ github.event_name == 'workflow_call' }}
+          cond: ${{ inputs.targetBranchName != '' }}
           if_true: ${{ inputs.targetBranchName }}
           if_false: ${{ github.ref_name }}
 
@@ -46,6 +48,8 @@ jobs:
       # Create tag
       - name: Create tag
         uses: actions/checkout@v3
+        with:
+          ref: ${{ steps.defineTargetBranchName.outputs.value }}
       - run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
