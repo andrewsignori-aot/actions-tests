@@ -51,4 +51,4 @@ jobs:
           git checkout -b "${{ inputs.releaseType }}/${{ inputs.versionName }}"
           git push --set-upstream origin "${{ inputs.releaseType }}/${{ inputs.versionName }}"
           git tag ${{ inputs.versionName }}-${{ inputs.releaseOption }}.0
-          git push --force
+          git push origin ${{ inputs.versionName }}-${{ inputs.releaseOption }}.0
