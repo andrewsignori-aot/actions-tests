@@ -40,9 +40,11 @@ jobs:
           git config user.email github-actions@github.com
           git checkout -b "${{ inputs.releaseType }}/${{ inputs.versionName }}"
           git push --set-upstream origin "${{ inputs.releaseType }}/${{ inputs.versionName }}"
-
-      # Executes the first build on the new branch.
-      - name: Deploy BPMNs and DMNs to Camunda
-        uses: ./.github/workflows/build-all.yml
-        with:
-          targetBranchName: "${{ inputs.releaseType }}/${{ inputs.versionName }}"
+  buildAll:
+    # Executes the first build on the new branch.
+    needs: createRelease
+    name: Buil all
+    uses: ./.github/workflows/build-all.yml
+    with:
+      targetBranchName: "${{ inputs.releaseType }}/${{ inputs.versionName }}"
+    secrets: inherit
