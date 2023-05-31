@@ -1,0 +1,34 @@
+name: Build all
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, closed]
+    branches:
+      - main
+      - "release/**"
+      - "hotfix/**"
+  workflow_dispatch:
+
+jobs:
+  # Create new tag.
+  createTag:
+    name: "Create tag"
+    runs-on: ubuntu-latest
+    steps:
+      # Print variables for logging and debugging purposes
+      - name: Print Env Vars
+        run: |
+          echo Git base ref: ${{ github.base_ref }}
+          echo Git run number: ${{ github.run_number }}
+      # Create tag
+      - name: Create tag
+        uses: actions/checkout@v3
+      - run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git tag "${{ github.base_ref }}+${{ github.run_number }}"
+          git push origin "${{ github.base_ref }}+${{ github.run_number }}"
+        # Do the build
+      - name: Build
+        run: |
+          echo version: ${{ github.base_ref }}+${{ github.run_number }}
