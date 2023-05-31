@@ -24,6 +24,7 @@ jobs:
       - name: Print Env Vars
         run: |
           echo Git ref_name: ${{ github.ref_name }}
+          echo Git run_number: ${{ github.run_id }}
           echo Git run_number: ${{ github.run_number }}
           echo Git event_name: ${{ github.event_name }}
           echo Git targetBranchName: ${{ inputs.targetBranchName }}
