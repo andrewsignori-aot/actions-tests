@@ -8,34 +8,30 @@ on:
       - "release/**"
       - "hotfix/**"
   workflow_dispatch:
-  workflow_call:
-    inputs:
-      targetBranchName:
-        required: true
-        type: string
 
 jobs:
   # Create new tag.
   buildAl:
+    if: github.event.pull_request.merged == true || github.event_name == 'workflow_dispatch'
     name: Build all
     runs-on: ubuntu-latest
     steps:
       # Print variables for logging and debugging purposes.
       - name: Print Env Vars
         run: |
+          echo Git base_ref: ${{ github.base_ref }}
           echo Git ref_name: ${{ github.ref_name }}
-          echo Git run_number: ${{ github.run_id }}
+          echo Git run_id: ${{ github.run_id }}
           echo Git run_number: ${{ github.run_number }}
           echo Git event_name: ${{ github.event_name }}
-          echo Git targetBranchName: ${{ inputs.targetBranchName }}
 
       # Define target branch name.
       - name: Define target branch name
         uses: haya14busa/action-cond@v1
         id: defineTargetBranchName
         with:
-          cond: ${{ inputs.targetBranchName != '' }}
-          if_true: ${{ inputs.targetBranchName }}
+          cond: ${{ github.event_name == 'pull_request' }}
+          if_true: ${{ github.base_ref }}
           if_false: ${{ github.ref_name }}
 
       # Define version name (e.g. v1.0.0+123).
