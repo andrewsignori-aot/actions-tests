@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       gitRef:
-        description: "Git Ref (e.g. v0.0.0-prerelease.45)"
+        description: "Git Ref (e.g. main+456)"
         required: true
         default: ""
       releaseType:
@@ -14,19 +14,10 @@ on:
         options:
           - release
           - hotfix
-      releaseOption:
-        description: "Release option"
-        required: true
-        default: "preminor"
-        type: choice
-        options:
-          - premajor
-          - preminor
-          - prepatch
       versionName:
         description: "Version name (must follow e.g. v1.0.0)"
         required: true
-        default: ""
+        default: "v0.0.0"
 
 jobs:
   createRelease:
@@ -39,14 +30,19 @@ jobs:
           echo Git Base Ref: ${{ github.base_ref }}
           echo Git Pull Request Ref: ${{ inputs.gitRef }}
 
-      # Create the branch
+      # Create the branch.
       - name: Create branch
         uses: actions/checkout@v3
         with:
           ref: ${{ github.event.inputs.gitRef }}
-          fetch-depth: 0
       - run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
           git checkout -b "${{ inputs.releaseType }}/${{ inputs.versionName }}"
           git push --set-upstream origin "${{ inputs.releaseType }}/${{ inputs.versionName }}"
+
+      # Executes the first build on the new branch.
+      - name: Deploy BPMNs and DMNs to Camunda
+        uses: ./.github/workflows/build-all.yml
+        with:
+          targetBranchName: "${{ inputs.releaseType }}/${{ inputs.versionName }}"
