@@ -36,6 +36,10 @@ jobs:
     name: "Create tag"
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - name: Print Env Vars
         run: |
           echo Git Base Ref: ${{ github.base_ref }}
