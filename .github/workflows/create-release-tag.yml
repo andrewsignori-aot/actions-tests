@@ -1,17 +1,66 @@
-name: Create Release/Hotfix tag on new branches
+name: Create Release/Hotfix tag
 
 on:
-  push:
-    branches:
-      - "release/**"
-      - "hotfix/**"
+  workflow_dispatch:
+    inputs:
+      bumb:
+        description: "Select the version."
+        required: false
+        default: "prerelease"
+        type: choice
+        options:
+          - prerelease
+          - major
+          - premajor
+          - minor
+          - preminor
+          - patch
+          - prepatch
+      releaseType:
+        description: "Select the release type. By default, only a tag will be created. If you want to create a release with the tag select the type."
+        type: choice
+        required: false
+        options:
+          -
+          - draft
+          - publish
 
 jobs:
-  createRelease:
-    name: "Create release/hotfix"
+  # Create new tag.
+  createTag:
+    name: "Create tag"
     runs-on: ubuntu-latest
     steps:
-      # Print variables for logging and debugging purposes
       - name: Print Env Vars
         run: |
           echo Git Base Ref: ${{ github.base_ref }}
+      - name: Get bumb value
+        uses: haya14busa/action-cond@v1
+        id: getBumb
+        with:
+          cond: ${{ github.event_name == 'workflow_dispatch'}}
+          if_true: ${{ inputs.bumb }}
+          if_false: "prerelease"
+
+      - name: Get preId value, if provided
+        uses: haya14busa/action-cond@v1
+        id: getPreId
+        with:
+          cond: ${{ inputs.bumb == 'premajor' || inputs.bumb == 'preminor' || inputs.bumb == 'prepatch' || inputs.bumb == 'prerelease' }}
+          if_true: ${{ inputs.bumb }}
+          if_false: "prerelease"
+      - run: |
+          echo "bumb: ${{ steps.getBumb.outputs.value }}"
+          echo "preId: ${{ steps.getPreId.outputs.value }}"
+
+      - id: createNextTag
+        name: "Create tag"
+        uses: zwaldowski/semver-release-action@v3
+        with:
+          prefix: "v"
+          preid: ${{ steps.getPreId.outputs.value }}
+          bump: ${{ steps.getBumb.outputs.value }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+      - run: echo "Tag ${{ steps.createNextTag.outputs.version_tag }} created!"
+    outputs:
+      newTag: ${{ steps.createNextTag.outputs.version_tag }}
