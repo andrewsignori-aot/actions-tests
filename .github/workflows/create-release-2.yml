@@ -60,6 +60,12 @@ jobs:
           git checkout -b "${{ steps.releaseOrHotfix.outputs.value }}/new-${{ steps.releaseOrHotfix.outputs.value }}"
           git push --set-upstream origin "${{ steps.releaseOrHotfix.outputs.value }}/new-${{ steps.releaseOrHotfix.outputs.value }}"
 
+      - name: Checkout again
+        uses: actions/checkout@v3
+        with:
+          ref: "${{ steps.releaseOrHotfix.outputs.value }}/new-${{ steps.releaseOrHotfix.outputs.value }}"
+          fetch-depth: 0
+
       # Create release tag
       - name: "Create release tag"
         if: steps.releaseOrHotfix.outputs.value == 'release'
@@ -70,7 +76,7 @@ jobs:
           preid: "prerelease"
           bump: ${{ inputs.bumb }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          dry_run: true
+          dry_run: false
           per_branch: false
       - run: echo "Release tag ${{ steps.releaseNextTag.outputs.version_tag }} created!"
 
