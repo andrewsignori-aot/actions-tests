@@ -49,6 +49,5 @@ jobs:
           git config user.name github-actions
           git config user.email github-actions@github.com
           git checkout -b "${{ inputs.releaseType }}/${{ inputs.versionName }}"
-          git push --set-upstream origin "${{ inputs.releaseType }}/${{ inputs.versionName }}"
           git tag "${{ inputs.versionName }}-${{ inputs.releaseOption }}.0"
-          git push
+          git push --set-upstream origin "${{ inputs.releaseType }}/${{ inputs.versionName }}"
