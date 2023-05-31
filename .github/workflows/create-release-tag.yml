@@ -3,6 +3,11 @@ name: Create Release/Hotfix tag
 on:
   workflow_dispatch:
     inputs:
+      perBranch:
+        description: "Per branch"
+        required: true
+        default: false
+        type: boolean
       bumb:
         description: "Select the version."
         required: false
@@ -60,6 +65,7 @@ jobs:
           prefix: "v"
           preid: ${{ steps.getPreId.outputs.value }}
           bump: ${{ steps.getBumb.outputs.value }}
+          per_branch: ${{ inputs.perBranch }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
       - run: echo "Tag ${{ steps.createNextTag.outputs.version_tag }} created!"
     outputs:
