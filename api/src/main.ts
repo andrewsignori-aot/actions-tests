@@ -1,17 +1,9 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-// v1.0.0 - change 1
-// v1.0.0 - change 2
-// v1.0.0 - change 3
-// v1.0.0 - changed on branch
-// v2.0.0 - change 1
-// v2.0.0 - change 2
-// v2.0.0 - change 3
 
+// #1111 - Change 1
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   await app.listen(3000);
 }
 bootstrap();
-// Testing a hotfix
-// Testing second change
